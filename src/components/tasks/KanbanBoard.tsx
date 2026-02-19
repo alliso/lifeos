@@ -118,6 +118,7 @@ export function KanbanBoard() {
               title={col.title}
               tasks={tasks.filter((t) => t.status === col.id)}
               onRefresh={fetchTasks}
+              onAddTask={() => handleCreateInColumn(col.id)}
             />
           ))}
         </div>
