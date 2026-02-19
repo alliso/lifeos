@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { MoreHorizontal, Pencil, Trash2, ArrowRight, ArrowLeft } from "lucide-react";
+import { MoreHorizontal, Pencil, Trash2, ArrowRight, ArrowLeft, Calendar, Clock, AlertCircle } from "lucide-react";
 import type { DraggableProvidedDragHandleProps } from "@hello-pangea/dnd";
 import { createClient } from "@/lib/supabase/client";
 import type { Task } from "@/lib/types";
@@ -23,6 +23,20 @@ interface TaskCardProps {
   showMoveToBoard?: boolean;
   showMoveToBacklog?: boolean;
   dragHandleProps?: DraggableProvidedDragHandleProps | null;
+}
+
+function formatDate(iso: string) {
+  return new Date(iso).toLocaleDateString("es-ES", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+}
+
+function isDueDateOverdue(dueDate: string) {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return new Date(dueDate) < today;
 }
 
 const statusColors: Record<string, string> = {
@@ -128,10 +142,37 @@ export function TaskCard({
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
-          <div className="mt-2">
+          <div className="mt-2 flex flex-wrap items-center gap-2">
             <Badge variant={statusColors[task.status] as "secondary" | "outline" | "default" | "destructive"} className="text-xs">
               {statusLabels[task.status]}
             </Badge>
+            {task.due_date && (
+              <span
+                className={`flex items-center gap-1 text-xs ${
+                  task.status !== "completed" && isDueDateOverdue(task.due_date)
+                    ? "text-destructive font-medium"
+                    : "text-muted-foreground"
+                }`}
+              >
+                {task.status !== "completed" && isDueDateOverdue(task.due_date) ? (
+                  <AlertCircle className="h-3 w-3" />
+                ) : (
+                  <Calendar className="h-3 w-3" />
+                )}
+                {formatDate(task.due_date)}
+              </span>
+            )}
+          </div>
+          <div className="mt-1.5 flex flex-wrap gap-x-3 gap-y-0.5">
+            <span className="flex items-center gap-1 text-xs text-muted-foreground">
+              <Clock className="h-3 w-3" />
+              {formatDate(task.created_at)}
+            </span>
+            {task.updated_at !== task.created_at && (
+              <span className="text-xs text-muted-foreground">
+                · act. {formatDate(task.updated_at)}
+              </span>
+            )}
           </div>
         </CardContent>
       </Card>

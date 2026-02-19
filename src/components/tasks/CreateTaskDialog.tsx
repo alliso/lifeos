@@ -31,6 +31,7 @@ export function CreateTaskDialog({
 }: CreateTaskDialogProps) {
   const [title, setTitle] = useState(task?.title ?? "");
   const [description, setDescription] = useState(task?.description ?? "");
+  const [dueDate, setDueDate] = useState(task?.due_date ?? "");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const supabase = createClient();
@@ -50,6 +51,7 @@ export function CreateTaskDialog({
         .update({
           title: title.trim(),
           description: description.trim() || null,
+          due_date: dueDate || null,
           updated_at: new Date().toISOString(),
         })
         .eq("id", task.id);
@@ -73,6 +75,7 @@ export function CreateTaskDialog({
       const { error } = await supabase.from("tasks").insert({
         title: title.trim(),
         description: description.trim() || null,
+        due_date: dueDate || null,
         status: defaultStatus,
         user_id: user.id,
       });
@@ -86,6 +89,7 @@ export function CreateTaskDialog({
 
     setTitle("");
     setDescription("");
+    setDueDate("");
     setLoading(false);
     onOpenChange(false);
     onSuccess();
@@ -95,6 +99,7 @@ export function CreateTaskDialog({
     if (!open) {
       setTitle(task?.title ?? "");
       setDescription(task?.description ?? "");
+      setDueDate(task?.due_date ?? "");
       setError(null);
     }
     onOpenChange(open);
@@ -128,6 +133,15 @@ export function CreateTaskDialog({
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Descripción de la tarea..."
               className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="due_date">Fecha límite (opcional)</Label>
+            <Input
+              id="due_date"
+              type="date"
+              value={dueDate}
+              onChange={(e) => setDueDate(e.target.value)}
             />
           </div>
           {error && <p className="text-sm text-destructive">{error}</p>}

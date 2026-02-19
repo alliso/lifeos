@@ -9,8 +9,12 @@ CREATE TABLE tasks (
   -- values: 'backlog' | 'todo' | 'active' | 'completed'
   created_at   TIMESTAMPTZ DEFAULT NOW(),
   updated_at   TIMESTAMPTZ DEFAULT NOW(),
-  completed_at TIMESTAMPTZ
+  completed_at TIMESTAMPTZ,
+  due_date     DATE
 );
+
+-- Migration: run this if the table already exists
+-- ALTER TABLE tasks ADD COLUMN IF NOT EXISTS due_date DATE;
 
 ALTER TABLE tasks ENABLE ROW LEVEL SECURITY;
 
