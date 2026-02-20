@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { LayoutDashboard, CheckSquare, LogOut } from "lucide-react";
+import { LayoutDashboard, CheckSquare, LogOut, Repeat } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -17,6 +17,11 @@ const navItems = [
     href: "/tasks",
     label: "Tareas",
     icon: CheckSquare,
+  },
+  {
+    href: "/habits",
+    label: "Hábitos",
+    icon: Repeat,
   },
 ];
 
