@@ -1,70 +1,94 @@
 # LifeOS
 
-Aplicación personal de gestión de tareas construida con Next.js y Supabase.
+> Tu sistema operativo personal — gestiona tareas, hábitos y proyectos en un solo lugar.
 
-## Stack
+Aplicación web construida con **Next.js 14** y **Supabase**, diseñada para ser rápida, privada y completamente tuya.
 
-- **Next.js 14** (App Router) + TypeScript
-- **Supabase** — base de datos PostgreSQL + autenticación
-- **Tailwind CSS** + **shadcn/ui**
-- **@hello-pangea/dnd** — drag & drop en el tablero kanban
+---
 
-## Requisitos previos
+## Tecnologías
+
+| Capa | Tecnología |
+|------|-----------|
+| Frontend | Next.js 14 (App Router) + TypeScript |
+| Base de datos y Auth | Supabase (PostgreSQL + RLS) |
+| Estilos | Tailwind CSS + shadcn/ui |
+| Drag & drop | @hello-pangea/dnd |
+
+---
+
+## Primeros pasos
+
+### Requisitos
 
 - Node.js 18+
-- Un proyecto en [Supabase](https://supabase.com)
+- Una cuenta en [Supabase](https://supabase.com) (plan gratuito es suficiente)
 
-## Configuración
+### Instalación
 
-1. Clona el repositorio e instala dependencias:
-
-   ```bash
-   npm install
-   ```
-
-2. Crea el archivo `.env.local` en la raíz del proyecto:
-
-   ```env
-   NEXT_PUBLIC_SUPABASE_URL=https://<tu-proyecto>.supabase.co
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=<tu-anon-key>
-   ```
-
-3. Ejecuta el schema SQL en el editor de Supabase (sección *SQL Editor*):
-
-   ```sql
-   -- supabase-schema.sql
-   CREATE TABLE tasks (
-     id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-     user_id      UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
-     title        TEXT NOT NULL,
-     description  TEXT,
-     status       TEXT NOT NULL DEFAULT 'backlog',
-     created_at   TIMESTAMPTZ DEFAULT NOW(),
-     updated_at   TIMESTAMPTZ DEFAULT NOW(),
-     completed_at TIMESTAMPTZ
-   );
-
-   ALTER TABLE tasks ENABLE ROW LEVEL SECURITY;
-
-   CREATE POLICY "Cada usuario solo ve sus tareas"
-     ON tasks FOR ALL
-     USING (auth.uid() = user_id);
-   ```
-
-4. Habilita el proveedor **Email** en *Authentication → Providers* de Supabase y crea un usuario de prueba.
-
-## Desarrollo
+**1. Clona e instala dependencias**
 
 ```bash
-npm run dev    # Servidor de desarrollo en http://localhost:3000
-npm run build  # Build de producción
-npm run lint   # Linter
+git clone <url-del-repo>
+cd lifeos
+npm install
 ```
+
+**2. Configura las variables de entorno**
+
+Crea un archivo `.env.local` en la raíz del proyecto:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=https://<tu-proyecto>.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=<tu-anon-key>
+```
+
+Puedes encontrar estos valores en tu proyecto de Supabase bajo *Settings → API*.
+
+**3. Crea la base de datos**
+
+En el *SQL Editor* de Supabase, ejecuta el contenido de `supabase-schema.sql` (incluido en el repo). Esto crea la tabla `tasks` con Row-Level Security habilitado.
+
+**4. Activa la autenticación por email**
+
+En Supabase ve a *Authentication → Providers*, habilita **Email** y crea un usuario de prueba.
+
+**5. Arranca el servidor**
+
+```bash
+npm run dev
+```
+
+Abre [http://localhost:3000](http://localhost:3000) en tu navegador.
+
+---
+
+## Comandos disponibles
+
+```bash
+npm run dev    # Servidor de desarrollo
+npm run build  # Build de producción
+npm run lint   # Comprobación de código con ESLint
+```
+
+---
 
 ## Funcionalidades
 
-- Autenticación con email y contraseña
-- Tablero kanban con columnas: **Backlog → To Do → En curso → Completado**
-- Drag & drop para mover tareas entre columnas
-- Vista de backlog y tareas archivadas
-- Cada usuario solo ve sus propias tareas (Row-Level Security)
+### Tareas
+
+- **Tablero Kanban** con tres columnas: _Por hacer_, _Activo_ y _Finalizado_
+- **Drag & drop** para mover tareas entre columnas
+- **Backlog** para aparcar tareas sin prioridad; se mueven al tablero cuando estés listo
+- **Archivados** — las tareas completadas hace más de 7 días se guardan aquí automáticamente
+- **Fecha límite** — se muestra en rojo con alerta si la tarea está vencida
+- Botón **"+"** en cada columna para crear una tarea directamente en ese estado
+- Cada tarea puede tener título, descripción y fecha límite
+- Menú de opciones en cada tarjeta: editar, mover o eliminar
+
+### Hábitos
+
+- **Lista de hábitos** con soporte para frecuencia diaria, semanal o personalizada (_N veces por semana_)
+- **Marcar hábito del día** con un solo clic; el botón se pone verde al completarlo
+- **Racha (streak)** automática — se calcula solo según los días o semanas que hayas cumplido el hábito
+- Historial de los últimos 90 días para calcular rachas largas
