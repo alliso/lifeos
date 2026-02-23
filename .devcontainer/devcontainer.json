@@ -1,6 +1,6 @@
 {
   "name": "LifeOS",
-  "image": "mcr.microsoft.com/devcontainers/javascript-node:1-18-bullseye",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:1-22-bookworm",
 
   "features": {
     // Docker-in-Docker para que la Supabase CLI pueda levantar contenedores
