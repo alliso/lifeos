@@ -63,6 +63,61 @@ Abre [http://localhost:3000](http://localhost:3000) en tu navegador.
 
 ---
 
+## Desarrollo local (sin cuenta en Supabase)
+
+Puedes correr toda la pila localmente usando la **Supabase CLI** y Docker, sin necesidad de una cuenta en la nube.
+
+### Requisitos adicionales
+
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) corriendo
+
+### Configuración
+
+**1. Instala la Supabase CLI**
+
+```bash
+brew install supabase/tap/supabase
+```
+
+**2. Arranca Supabase local**
+
+```bash
+supabase start
+```
+
+La primera vez descarga las imágenes Docker (~5 min). Al terminar imprime las URLs y claves locales:
+
+```
+Project URL: http://127.0.0.1:54321
+Publishable:  sb_publishable_...
+```
+
+**3. Actualiza `.env.local`** con esos valores:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321
+NEXT_PUBLIC_SUPABASE_ANON_KEY=<publishable key del output>
+```
+
+**4. Arranca la app**
+
+```bash
+npm run dev
+```
+
+### Comandos útiles
+
+```bash
+supabase stop    # Detener instancia local
+supabase start   # Volver a arrancar (rápido — imágenes ya descargadas)
+supabase status  # Ver URLs y claves actuales
+supabase studio  # Abrir Supabase Studio en el navegador (UI de la BD)
+```
+
+Supabase Studio estará disponible en [http://127.0.0.1:54323](http://127.0.0.1:54323).
+
+---
+
 ## Comandos disponibles
 
 ```bash
