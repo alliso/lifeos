@@ -18,8 +18,7 @@ export function ArchivedList() {
     const { data } = await supabase
       .from("tasks")
       .select("*")
-      .eq("status", "completed")
-      .lt("completed_at", sevenDaysAgo.toISOString())
+      .or(`status.eq.cancelled,and(status.eq.completed,completed_at.lt.${sevenDaysAgo.toISOString()})`)
       .order("completed_at", { ascending: false });
 
     setTasks(data ?? []);
@@ -35,7 +34,7 @@ export function ArchivedList() {
       <div>
         <h1 className="text-xl font-semibold">Archivados</h1>
         <p className="text-sm text-muted-foreground">
-          Tareas finalizadas hace más de 7 días ·{" "}
+          Tareas canceladas y finalizadas hace más de 7 días ·{" "}
           {tasks.length} {tasks.length === 1 ? "tarea" : "tareas"}
         </p>
       </div>

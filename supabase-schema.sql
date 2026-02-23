@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS tasks (
   title        TEXT NOT NULL,
   description  TEXT,
   status       TEXT NOT NULL DEFAULT 'backlog',
-  -- values: 'backlog' | 'todo' | 'active' | 'completed'
+  -- values: 'backlog' | 'todo' | 'active' | 'completed' | 'cancelled'
   created_at   TIMESTAMPTZ DEFAULT NOW(),
   updated_at   TIMESTAMPTZ DEFAULT NOW(),
   completed_at TIMESTAMPTZ,

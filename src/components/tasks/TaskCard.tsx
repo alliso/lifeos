@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { MoreHorizontal, Pencil, Trash2, ArrowRight, ArrowLeft, Calendar, Clock, AlertCircle } from "lucide-react";
+import { MoreHorizontal, Pencil, Trash2, ArrowRight, ArrowLeft, Calendar, Clock, AlertCircle, Ban } from "lucide-react";
 import type { DraggableProvidedDragHandleProps } from "@hello-pangea/dnd";
 import { createClient } from "@/lib/supabase/client";
 import type { Task } from "@/lib/types";
@@ -14,6 +14,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+  DialogClose,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { CreateTaskDialog } from "./CreateTaskDialog";
 
@@ -44,6 +53,7 @@ const statusColors: Record<string, string> = {
   todo: "outline",
   active: "default",
   completed: "secondary",
+  cancelled: "destructive",
 };
 
 const statusLabels: Record<string, string> = {
@@ -51,6 +61,7 @@ const statusLabels: Record<string, string> = {
   todo: "Por hacer",
   active: "Activo",
   completed: "Finalizado",
+  cancelled: "Cancelado",
 };
 
 export function TaskCard({
@@ -61,6 +72,7 @@ export function TaskCard({
   dragHandleProps,
 }: TaskCardProps) {
   const [editOpen, setEditOpen] = useState(false);
+  const [cancelConfirmOpen, setCancelConfirmOpen] = useState(false);
   const supabase = createClient();
 
   async function handleDelete() {
@@ -85,6 +97,19 @@ export function TaskCard({
         updated_at: new Date().toISOString(),
       })
       .eq("id", task.id);
+    onRefresh();
+  }
+
+  async function handleCancel() {
+    await supabase
+      .from("tasks")
+      .update({
+        status: "cancelled",
+        completed_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", task.id);
+    setCancelConfirmOpen(false);
     onRefresh();
   }
 
@@ -131,6 +156,10 @@ export function TaskCard({
                     Mover al backlog
                   </DropdownMenuItem>
                 )}
+                <DropdownMenuItem onClick={() => setCancelConfirmOpen(true)}>
+                  <Ban className="mr-2 h-3.5 w-3.5" />
+                  Cancelar tarea
+                </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   className="text-destructive focus:text-destructive"
@@ -182,6 +211,24 @@ export function TaskCard({
         task={task}
         onSuccess={onRefresh}
       />
+      <Dialog open={cancelConfirmOpen} onOpenChange={setCancelConfirmOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>¿Cancelar esta tarea?</DialogTitle>
+            <DialogDescription>
+              La tarea &quot;{task.title}&quot; se marcará como cancelada y aparecerá en Archivados. Esta acción se puede deshacer moviendo la tarea al backlog.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button variant="outline">Volver</Button>
+            </DialogClose>
+            <Button variant="destructive" onClick={handleCancel}>
+              Cancelar tarea
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
