@@ -1,0 +1,43 @@
+{
+  "name": "LifeOS",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:1-18-bullseye",
+
+  "features": {
+    // Docker-in-Docker para que la Supabase CLI pueda levantar contenedores
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {
+      "version": "latest",
+      "enableNonRootDocker": "true"
+    },
+    // Supabase CLI
+    "ghcr.io/devcontainers-contrib/features/supabase-cli:1": {}
+  },
+
+  // Instala dependencias y arranca Supabase al crear el contenedor
+  "postCreateCommand": "bash .devcontainer/post-create.sh",
+
+  // Puertos expuestos
+  "forwardPorts": [3000, 54321, 54322, 54323, 54324],
+  "portsAttributes": {
+    "3000":  { "label": "Next.js",          "onAutoForward": "openPreview" },
+    "54321": { "label": "Supabase API",     "onAutoForward": "silent" },
+    "54322": { "label": "PostgreSQL",       "onAutoForward": "silent" },
+    "54323": { "label": "Supabase Studio",  "onAutoForward": "notify" },
+    "54324": { "label": "Mailpit",          "onAutoForward": "silent" }
+  },
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "bradlc.vscode-tailwindcss",
+        "Prisma.prisma"
+      ],
+      "settings": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.formatOnSave": true,
+        "typescript.tsdk": "node_modules/typescript/lib"
+      }
+    }
+  }
+}
