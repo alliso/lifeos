@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { LayoutDashboard, CheckSquare, LogOut, Repeat } from "lucide-react";
+import { LayoutDashboard, CheckSquare, LogOut, Repeat, Dumbbell } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -22,6 +22,11 @@ const navItems = [
     href: "/habits",
     label: "Hábitos",
     icon: Repeat,
+  },
+  {
+    href: "/workouts",
+    label: "Entrenamientos",
+    icon: Dumbbell,
   },
 ];
 
@@ -44,8 +49,8 @@ export function Sidebar() {
       <nav className="flex flex-1 flex-col gap-1 p-3">
         {navItems.map((item) => {
           const isActive =
-            item.href === "/tasks"
-              ? pathname.startsWith("/tasks")
+            item.href === "/tasks" || item.href === "/workouts"
+              ? pathname.startsWith(item.href)
               : pathname === item.href;
           return (
             <Link
