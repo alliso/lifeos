@@ -75,7 +75,7 @@ export function WorkoutDialog({
         setName("");
         setNotes("");
         setSessionTime("");
-        setStatus("planned");
+        setStatus("reserved");
       }
       setError(null);
     }
