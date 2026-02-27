@@ -68,25 +68,6 @@ DO $$ BEGIN
 END $$;
 
 -- Workouts
--- Columnas añadidas tras la creación inicial (idempotentes si la tabla ya existe)
-ALTER TABLE workout_plans ADD COLUMN IF NOT EXISTS session_time TIME;
-ALTER TABLE workout_plans ADD COLUMN IF NOT EXISTS active BOOLEAN NOT NULL DEFAULT TRUE;
-ALTER TABLE workout_sessions ADD COLUMN IF NOT EXISTS session_time TIME;
-ALTER TABLE workout_sessions ADD COLUMN IF NOT EXISTS status TEXT NOT NULL DEFAULT 'reserved';
-ALTER TABLE workout_sessions DROP COLUMN IF EXISTS completed;
-ALTER TABLE workout_sessions DROP COLUMN IF EXISTS completed_at;
-
--- Asegurar constraint de status (no hay IF NOT EXISTS para constraints, se usa DO)
-DO $$ BEGIN
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_constraint WHERE conname = 'workout_sessions_status_check'
-  ) THEN
-    ALTER TABLE workout_sessions
-      ADD CONSTRAINT workout_sessions_status_check
-      CHECK (status IN ('reserved', 'completed'));
-  END IF;
-END $$;
-
 CREATE TABLE IF NOT EXISTS workout_plans (
   id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id      UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
@@ -128,5 +109,24 @@ DO $$ BEGIN
     SELECT 1 FROM pg_policies WHERE tablename = 'workout_sessions' AND policyname = 'workout_sessions_user'
   ) THEN
     CREATE POLICY "workout_sessions_user" ON workout_sessions FOR ALL USING (auth.uid() = user_id);
+  END IF;
+END $$;
+
+-- Migraciones: columnas añadidas tras la creación inicial (idempotentes)
+ALTER TABLE workout_plans ADD COLUMN IF NOT EXISTS session_time TIME;
+ALTER TABLE workout_plans ADD COLUMN IF NOT EXISTS active BOOLEAN NOT NULL DEFAULT TRUE;
+ALTER TABLE workout_sessions ADD COLUMN IF NOT EXISTS session_time TIME;
+ALTER TABLE workout_sessions ADD COLUMN IF NOT EXISTS status TEXT NOT NULL DEFAULT 'reserved';
+ALTER TABLE workout_sessions DROP COLUMN IF EXISTS completed;
+ALTER TABLE workout_sessions DROP COLUMN IF EXISTS completed_at;
+
+-- Asegurar constraint de status (no hay IF NOT EXISTS para constraints, se usa DO)
+DO $$ BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'workout_sessions_status_check'
+  ) THEN
+    ALTER TABLE workout_sessions
+      ADD CONSTRAINT workout_sessions_status_check
+      CHECK (status IN ('reserved', 'completed'));
   END IF;
 END $$;
